@@ -1,6 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
 
 function Square(props) {
   return (
@@ -14,29 +14,25 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square
-      value={this.props.squares[i]}
-      onClick={() => this.props.onClick(i)}
+        value={this.props.squares[i]}
+        onClick={() => this.props.onClick(i)}
       />
     );
   }
 
   render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}{this.renderSquare(1)}{this.renderSquare(2)}{this.renderSquare(3)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(4)}{this.renderSquare(5)}{this.renderSquare(6)}{this.renderSquare(7)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(8)}{this.renderSquare(9)}{this.renderSquare(10)}{this.renderSquare(11)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(12)}{this.renderSquare(13)}{this.renderSquare(14)}{this.renderSquare(15)}
-        </div>
-      </div>
-    );
+    let boardsize = 5;
+    let items = [];
+    let place = 0;
+    for (let i = 0; i < boardsize; i++) {
+      let inneritems = [];
+      for (let y = i; y < boardsize + i; y++) {
+        inneritems.push(<>{this.renderSquare(place)}</>);
+        place++;
+      }
+      items.push(<div className="board-row">{inneritems}</div>);
+    }
+    return <div>{items}</div>;
   }
 }
 
@@ -44,28 +40,33 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [{
-        squares: Array(9).fill(null)
-      }],
-      xNext: true,
+      history: [
+        {
+          squares: Array(9).fill(null)
+        }
+      ],
+      xNext: true
     };
   }
 
   handleClick(i) {
-   const history = this.state.history;
-   const current = history[history.length - 1];
-   const squares = current.squares.slice();
-   if (calculateWinner(squares) || squares[i]) {
-     return;
-   }
-   squares[i] = this.state.xIsNext ? 'X' : 'O';
-   this.setState({
-     history: history.concat([{
-       squares: squares
-     }]),
-     xIsNext: !this.state.xIsNext,
-   });
- }
+    const history = this.state.history;
+    console.log(history);
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    squares[i] = this.state.xIsNext ? "X" : "O";
+    this.setState({
+      history: history.concat([
+        {
+          squares: squares
+        }
+      ]),
+      xIsNext: !this.state.xIsNext
+    });
+  }
 
   render() {
     const history = this.state.history;
@@ -74,15 +75,15 @@ class Game extends React.Component {
 
     let status;
     if (winner) {
-      status = 'Winner: ' + winner;
+      status = "Winner: " + winner;
     } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={current.squares} onClick={(i)=> this.handleClick(i)}/>
+          <Board squares={current.squares} onClick={i => this.handleClick(i)} />
         </div>
         <div className="game-info">
           <div>{status}</div>
@@ -94,21 +95,51 @@ class Game extends React.Component {
 }
 
 function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2, 3],
-    [4, 5, 6, 7],
-    [8, 9, 10, 11],
-    [12, 13, 14, 15],
-    [0, 5, 10, 15],
-    [3, 6, 9, 12],
-    [1, 5, 9, 13],
-    [0, 4, 8, 12],
-    [2, 6, 10, 14],
-    [3, 7, 11, 15],
-  ];
+  const size = 5;
+  const lines = [];
+
+  //generate winning grid
+  let counter = 0;
+  for (let i = 0; i < size; i++) {
+    let inner = [];
+    //side
+    for (let y = 0; y < size; y++) {
+      inner.push(counter);
+      counter++;
+    }
+    lines.push(inner);
+
+    //down
+    inner = [];
+    for (let y = i; y < size * size; y = y + size) {
+      inner.push(y);
+    }
+    lines.push(inner);
+  }
+
+  //diagonals
+  counter = 0;
+  let counterback = size - 1;
+  let inner = [];
+  let innerback = [];
+  for (let i = 0; i < size; i++) {
+    inner.push(counter);
+    innerback.push(counterback);
+    counter += size + 1;
+    counterback += size - 1;
+  }
+  lines.push(inner);
+  lines.push(innerback);
+
   for (let i = 0; i < lines.length; i++) {
+    for (let y = 0; y < size; y++) {}
     const [a, b, c, d] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c] && squares[a] === squares[d]) {
+    if (
+      squares[a] &&
+      squares[a] === squares[b] &&
+      squares[a] === squares[c] &&
+      squares[a] === squares[d]
+    ) {
       return squares[a];
     }
   }
@@ -117,7 +148,4 @@ function calculateWinner(squares) {
 
 // ========================================
 
-ReactDOM.render(
-  <Game />,
-  document.getElementById('root')
-);
+ReactDOM.render(<Game />, document.getElementById("root"));
