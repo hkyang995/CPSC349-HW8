@@ -120,7 +120,7 @@ class Game extends React.Component {
             ")"
           : "Go to game start";
         if (this.state.size === 0) {
-          return <div />;
+          return <div key={move} />;
         }
         if (this.state.stepNumber === move) {
           return (
@@ -148,7 +148,7 @@ class Game extends React.Component {
             ")"
           : "Go to game start";
         if (this.state.size === 0) {
-          return <div />;
+          return <div key={0} />;
         }
         if (this.state.stepNumber === reversed) {
           return (
@@ -316,5 +316,16 @@ function calculateWinner(squares, size) {
       }
     }
   }
-  return null;
+
+  if (size === 0) {
+    return null;
+  }
+
+  for (let x = 0; x < squares.length; x++) {
+    if (squares[x] === null) {
+      return null;
+    }
+  }
+
+  return ["Tie", []];
 }
